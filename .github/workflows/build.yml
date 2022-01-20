@@ -38,7 +38,6 @@ jobs:
           make -C libiberty CFLAGS="${{ matrix.TARGET.CFLAGS }}"
           make -C gas CFLAGS="${{ matrix.TARGET.CFLAGS }}"
           make -C binutils CFLAGS="${{ matrix.TARGET.CFLAGS }}"
-          sudo make install
       - name: Test for file
         shell: bash
         run: |
@@ -47,8 +46,8 @@ jobs:
       - name: Create release archive
         shell: bash
         run: |
-          cp /opt/cross/bin/mips-mips-elf-ar ar
-          cp /opt/cross/bin/mips-mips-elf-as as
+          cp binutils/ar ar
+          cp gas/as.new as
           strip ar
           strip as
           chmod +x ar
