@@ -93,7 +93,7 @@ extern void obj_elf_init_stab_section PARAMS ((segT));
 
 /* For now, always set ECOFF_DEBUGGING for a MIPS target.  */
 #ifdef TC_MIPS
-#define ECOFF_DEBUGGING 1
+// #define ECOFF_DEBUGGING 0
 #endif
 
 #if ECOFF_DEBUGGING

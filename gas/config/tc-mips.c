@@ -562,7 +562,7 @@ md_begin ()
 	       || strcmp (cpu, "r4000") == 0
 	       || strcmp (cpu, "mips3") == 0)
 	{
-	  mips_isa = 3;
+	  mips_isa = 2;
 	  if (mips_cpu == -1)
 	    mips_cpu = 4000;
 	}
@@ -589,7 +589,7 @@ md_begin ()
 	}
       else if (strcmp (cpu, "mips64vr4300") == 0)
 	{
-	  mips_isa = 3;
+	  mips_isa = 2;
 	  if (mips_cpu == -1)
 	    mips_cpu = 4300;
 	}
@@ -5386,7 +5386,7 @@ md_parse_option (c, arg)
       break;
 
     case OPTION_MIPS3:
-      mips_isa = 3;
+      mips_isa = 2;
       if (mips_cpu == -1)
 	mips_cpu = 4000;
       break;
@@ -6871,6 +6871,7 @@ int
 mips_local_label (name)
      const char *name;
 {
+	return name[0] == '.' && name[1] == 'L';
 #ifndef NO_ECOFF_DEBUGGING
   if (ECOFF_DEBUGGING
       && mips_debug != 0

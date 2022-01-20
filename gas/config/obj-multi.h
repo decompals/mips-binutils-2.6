@@ -19,7 +19,7 @@
 #define OBJ_PROCESS_STAB	(this_format->process_stab)
 
 #if defined (OBJ_MAYBE_ECOFF) || (defined (OBJ_MAYBE_ELF) && defined (TC_MIPS))
-#define ECOFF_DEBUGGING 1
+// #define ECOFF_DEBUGGING 0
 #endif
 
 #ifdef OBJ_MAYBE_ELF

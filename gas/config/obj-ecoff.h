@@ -22,7 +22,7 @@
 #define OBJ_ECOFF 1
 
 /* Use the generic ECOFF debugging code.  */
-#define ECOFF_DEBUGGING 1
+// #define ECOFF_DEBUGGING 0
 
 #define OUTPUT_FLAVOR bfd_target_ecoff_flavour
 
