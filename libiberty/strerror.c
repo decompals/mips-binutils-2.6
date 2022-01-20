@@ -460,10 +460,18 @@ static int sys_nerr;
 static const char **sys_errlist;
 
 #else
+#ifdef DARWIN
+
+// macOS added 'const' to these declarations, and clang complains if they are otherwise
+extern const int sys_nerr;
+extern const char *sys_errlist[];
+
+#else
 
 extern int sys_nerr;
 extern char *sys_errlist[];
 
+#endif
 #endif
 
 
