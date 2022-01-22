@@ -125,6 +125,188 @@ input_file_pop (arg)
 
   free (arg);
 }
+
+int vr4300mul_enabled = -1;
+
+// Mimic KMC as mulmul fix functionality
+char* read_asm(const char *pathname, size_t* output_size) {
+    int bVar2;
+    int bVar3;
+    FILE* fd;
+    int iVar7;
+    size_t input_size;
+    char *buffer;
+    size_t num_bytes_read;
+    void *output;
+    char *next_input_pos;
+    char *vr4300mul_env;
+    char *cur_insn_mul;
+    size_t initial_output_size;
+    char *cur_output_pos;
+    char cur_output_char;
+    int cur_char;
+    uint prev_insn_was_float_mul;
+    char *local_28;
+    char *cur_insn;
+    char *cur_input_pos;
+    char cur_insn_first_char;
+
+    fd = fopen(pathname, "r");
+    fseek(fd, 0, SEEK_END);
+    input_size = ftell(fd);
+    initial_output_size = input_size;
+    if (input_size < 0x10000)
+    {
+        initial_output_size = 0x10000;
+    }
+    fseek(fd, 0, SEEK_SET);
+    buffer = (char *)malloc(initial_output_size + 100 + input_size);
+    num_bytes_read = fread(buffer + initial_output_size, 1, input_size, fd);
+    if (input_size == num_bytes_read)
+    {
+        buffer[initial_output_size + input_size] = '\x1a';
+        cur_input_pos = buffer + initial_output_size;
+        bVar3 = false;
+        bVar2 = false;
+        iVar7 = 0;
+        local_28 = (char *)0x0;
+        cur_insn = (char *)0x0;
+        prev_insn_was_float_mul = 0;
+        cur_output_pos = buffer;
+        if (vr4300mul_enabled == -1)
+        {
+            vr4300mul_enabled = 1;
+            vr4300mul_env = getenv("VR4300MUL");
+            if (vr4300mul_env != NULL)
+            {
+                while (isspace(*vr4300mul_env))
+                {
+                    vr4300mul_env++;
+                }
+                if (strncasecmp(vr4300mul_env, "OFF", 3) == 0)
+                {
+                    vr4300mul_enabled = 0;
+                }
+            }
+        }
+    loop_start:
+        cur_char = (int)*cur_input_pos;
+        next_input_pos = cur_input_pos + 1;
+        /* If the current character is a carriage return and the next character is a
+            line feed, skip the carriage return */
+        if (cur_char == '\r')
+        {
+            if (*next_input_pos == '\n')
+            {
+                cur_char = '\n';
+                next_input_pos = cur_input_pos + 2;
+            }
+        }
+        else
+        {
+            /* End of file */
+            if (cur_char == 0x1a)
+            {
+                *output_size = cur_output_pos - buffer;
+                output = realloc(buffer, cur_output_pos - buffer);
+                fclose(fd);
+                return output;
+            }
+        }
+        cur_input_pos = next_input_pos;
+        cur_output_char = (char)cur_char;
+        if (iVar7 != 0)
+        {
+            if (cur_char == '\n')
+            {
+            check_mulmul:
+                if (vr4300mul_enabled != 0)
+                {
+                    if (((cur_insn == NULL) && (cur_char != ' ')) && (cur_char != '\t'))
+                    {
+                        cur_insn = cur_output_pos;
+                    }
+                    if ((cur_char == '\n') && (cur_insn != NULL))
+                    {
+                        cur_insn_first_char = *cur_insn;
+                        if (prev_insn_was_float_mul == 0)
+                        {
+                            if ((local_28 == cur_insn) ||
+                                (((cur_insn_first_char == 'm' && (cur_insn[1] == 'u')) &&
+                                    (((cur_insn[2] == 'l' && (cur_insn[3] == '.')) &&
+                                    ((cur_insn[4] == 's' || (cur_insn[4] == 'd'))))))))
+                            {
+                                prev_insn_was_float_mul = 1;
+                            }
+                        }
+                        else
+                        {
+                            cur_insn_mul = cur_insn;
+                            if (cur_insn_first_char == 'd')
+                            {
+                                cur_insn_mul = cur_insn + 1;
+                            }
+                            if (((*cur_insn_mul == 'm') && (cur_insn_mul[1] == 'u')) &&
+                                (cur_insn_mul[2] == 'l'))
+                            {
+                                prev_insn_was_float_mul = (cur_insn_mul[3] == '.') ? 1 : 0;
+                                /* Shift the file forward by 5 characters */
+                                bcopy(cur_insn, cur_insn + 5, cur_output_pos - cur_insn);
+                                /* Insert a nop, newline and tab into the gap created by the previous bcopy */
+                                bcopy("nop\n\t", cur_insn, 5);
+                                cur_output_pos = cur_output_pos + 5;
+                            }
+                            else
+                            {
+                                if (isalpha(cur_insn_first_char))
+                                {
+                                    prev_insn_was_float_mul = 0;
+                                }
+                            }
+                        }
+                        cur_insn = NULL;
+                        local_28 = cur_output_pos + 1;
+                    }
+                }
+                goto write_output;
+            }
+            if ((cur_char == '*') && (*cur_input_pos == '/'))
+            {
+                cur_input_pos = cur_input_pos + 1;
+                iVar7 = 0;
+            }
+            goto loop_start;
+        }
+        if (!bVar2)
+        {
+            if (((cur_char != '/') || (*cur_input_pos != '*')) || (bVar3))
+            {
+                if (cur_char == '\\')
+                {
+                    bVar2 = true;
+                }
+                else
+                {
+                    if (cur_char != '"')
+                        goto check_mulmul;
+                    bVar3 = bVar3 ^ 1;
+                }
+                goto write_output;
+            }
+            iVar7 = 1;
+            cur_input_pos = cur_input_pos + 1;
+            goto loop_start;
+        }
+        bVar2 = false;
+    write_output:
+        *cur_output_pos = cur_output_char;
+        cur_output_pos = cur_output_pos + 1;
+        goto loop_start;
+    }
+    fclose(fd);
+    return NULL;
+}
+
 
 void
 input_file_open (filename, pre)
@@ -139,7 +321,21 @@ input_file_open (filename, pre)
   assert (filename != 0);	/* Filename may not be NULL. */
   if (filename[0])
     {				/* We have a file name. Suck it and see. */
-      f_in = fopen (filename, "r");
+      // Create a temp file to hold the processed output
+      char temp_filename[] = "astemp_XXXXXX.s";
+      int fd = mkstemps(temp_filename, 2);
+      unlink(temp_filename);
+      // Process the input file
+      size_t processed_size;
+      char* processed = read_asm(filename, &processed_size);
+      // Write the processed output to the "input" file
+      ssize_t written = write(fd, processed, processed_size);
+      fsync(fd);
+      lseek(fd, 0, SEEK_SET);
+      // Convert the temp file descriptor to a FILE* pointer
+      f_in = fdopen(fd, "r");
+      // Free the processed output
+      free(processed);
       file_name = filename;
     }
   else
