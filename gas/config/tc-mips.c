@@ -1457,19 +1457,31 @@ macro_build (place, counter, ep, name, fmt, va_alist)
   insn.insn_mo = (struct mips_opcode *) hash_find (op_hash, name);
   assert (insn.insn_mo);
   assert (strcmp (name, insn.insn_mo->name) == 0);
+  // kmc left some comments here based on the asserts
+  // wooooo whitespace
+
+
+
+
+
+
+
+
+
+
 
   while (strcmp (fmt, insn.insn_mo->args) != 0
 	 || insn.insn_mo->pinfo == INSN_MACRO
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_ISA2
 	     && mips_isa < 2)
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_ISA3
-	     && mips_isa < 3)
+	     && mips_isa < 2)
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_ISA4
 	     && mips_isa < 4)
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_4650
-	     && ! mips_4650)
+	     && mips_isa < 2)
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_4010
-	     && ! mips_4010)
+	     && mips_isa < 2)
 	 || ((insn.insn_mo->pinfo & INSN_ISA) == INSN_4100
 	     && ! mips_4100))
     {
@@ -1741,9 +1753,9 @@ load_register (counter, reg, ep, dbl)
 		       (int) BFD_RELOC_LO16);
 	  return;
 	}
-      else if (((ep->X_add_number &~ (offsetT) 0x7fffffff) == 0
-		|| ((ep->X_add_number &~ (offsetT) 0x7fffffff)
-		    == ~ (offsetT) 0x7fffffff))
+      else if (((ep->X_add_number & 0x80000000) == 0
+		|| ((ep->X_add_number & 0x80000000)
+		    == 0x80000000))
 	       && (! dbl
 		   || ! ep->X_unsigned
 		   || sizeof (ep->X_add_number) > 4
@@ -1774,7 +1786,11 @@ load_register (counter, reg, ep, dbl)
 
   /* The value is larger than 32 bits.  */
 
-  if (mips_isa < 3)
+  // kmc added more comments here
+  // padding
+
+  
+  if (mips_isa < 2)
     {
       as_bad ("Number larger than 32 bits");
       macro_build ((char *) NULL, counter, ep, "addiu", "t,r,j", reg, 0,
@@ -4421,6 +4437,10 @@ mips_ip (str, ip)
       else
 	insn_isa = 1;
 
+// this seems to have been added by kmc, but it makes things not match so I've elected to ignore it (probably missing some other changes)
+//       if (insn_isa > 1) {
+// 	insn_isa = 2;
+//       }
       if (insn_isa > mips_isa
 	  || ((insn->pinfo & INSN_ISA) == INSN_4650
 	      && ! mips_4650)
@@ -4728,7 +4748,11 @@ mips_ip (str, ip)
 		    as_bad ("Invalid float register number (%d)", regno);
 
 		  if ((regno & 1) != 0
-		      && mips_isa < 3
+		      // changed from 3 to 2 by kmc
+                      // whitespace padding for asserts
+
+
+		      && mips_isa < 2
 		      && ! (strcmp (str, "mtc1") == 0 ||
 			    strcmp (str, "mfc1") == 0 ||
 			    strcmp (str, "lwc1") == 0 ||
