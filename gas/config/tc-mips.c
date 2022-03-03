@@ -6353,7 +6353,9 @@ s_mipsset (x)
     }
   else
     {
-      as_warn ("Tried to set unrecognized symbol: %s\n", name);
+	*input_line_pointer = ch;
+	input_line_pointer = name;
+	s_set(x);
     }
   *input_line_pointer = ch;
   demand_empty_rest_of_line ();
