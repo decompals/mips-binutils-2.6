@@ -87,7 +87,7 @@ const struct mips_opcode mips_opcodes[] = {
 {"li",      "t,j",      0x24000000, 0xffe00000, WR_t		}, /* addiu */
 {"li",	    "t,i",	0x34000000, 0xffe00000, WR_t		}, /* ori */
 {"li",      "t,I",	0,    (int) M_LI,	INSN_MACRO	},
-{"move",    "d,s",	0x0000002d, 0xfc1f07ff, WR_d|RD_s|I3	},/* daddu */
+// {"move",    "d,s",	0x0000002d, 0xfc1f07ff, WR_d|RD_s|I3	},/* daddu */ // Removed by KMC
 {"move",    "d,s",	0x00000021, 0xfc1f07ff, WR_d|RD_s	},/* addu */
 {"move",    "d,s",	0x00000025, 0xfc1f07ff,	WR_d|RD_s	},/* or */
 {"b",       "p",	0x10000000, 0xffff0000,	UBD		},/* beq 0,0 */

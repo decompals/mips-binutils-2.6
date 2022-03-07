@@ -4438,9 +4438,9 @@ mips_ip (str, ip)
 	insn_isa = 1;
 
 // this seems to have been added by kmc, but it makes things not match so I've elected to ignore it (probably missing some other changes)
-//       if (insn_isa > 1) {
-// 	insn_isa = 2;
-//       }
+      if (insn_isa > 1) {
+	insn_isa = 2;
+      }
       if (insn_isa > mips_isa
 	  || ((insn->pinfo & INSN_ISA) == INSN_4650
 	      && ! mips_4650)
