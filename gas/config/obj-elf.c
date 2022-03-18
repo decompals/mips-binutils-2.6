@@ -213,6 +213,7 @@ obj_elf_common (ignore)
   int temp, size;
   symbolS *symbolP;
   int have_align;
+  int n64_extra_align;
 
   name = input_line_pointer;
   c = get_symbol_end ();
@@ -273,6 +274,26 @@ obj_elf_common (ignore)
 	      as_warn ("Common alignment negative; 0 assumed");
 	    }
 	}
+      if (size < 0x400)
+        {
+          if (size < 0x10)
+            {
+              n64_extra_align = 0;
+            }
+          else
+            {
+              n64_extra_align = 8;
+            }
+        }
+      else
+        {
+          n64_extra_align = 16;
+        }
+      if (temp < n64_extra_align)
+        {
+          as_warn("Variable %s would be aligned in KMC GCC (has %d, would have %d)",
+          S_GET_NAME (symbolP), temp, n64_extra_align);
+        }
       if (symbolP->local)
 	{
 	  segT old_sec;
