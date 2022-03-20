@@ -55,13 +55,16 @@ jobs:
           cp binutils/ar ar
           cp gas/as.new as
           cp binutils/strip.new strip
+          cp binutils/objcopy objcopy
           strip ar
           strip as
           strip strip
+          strip objcopy
           chmod +x ar
           chmod +x as
           chmod +x strip
-          tar -czf ${{ matrix.TARGET.ARCHIVE_NAME }} ar as strip
+          chmod +x objcopy
+          tar -czf ${{ matrix.TARGET.ARCHIVE_NAME }} ar as strip objcopy
       - name: Upload archive
         uses: actions/upload-artifact@v2
         with:
