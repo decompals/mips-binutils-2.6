@@ -114,7 +114,7 @@ Options:\n\
 -R			fold data section into text section\n\
 --statistics		print maximum bytes and total seconds used\n\
 --version		print assembler version number and exit\n\
--V, --vr4300mul-off\tturn off vr4300 mulmul fix\n\
+-V, --vr4300mul-off	turn off vr4300 mulmul fix\n\
 -W			suppress warnings\n\
 -w			ignored\n\
 -X			ignored\n\
@@ -488,10 +488,10 @@ parse_args (pargc, pargv)
 	    as_fatal ("virtual memory exhausted");
 	  break;
 
-  case 'V':
-    extern int vr4300mul_enabled;
-    vr4300mul_enabled = 0;
-    break;
+	case 'V':
+	  extern int vr4300mul_enabled;
+	  vr4300mul_enabled = 0;
+	  break;
 
 	case 'w':
 	  break;
