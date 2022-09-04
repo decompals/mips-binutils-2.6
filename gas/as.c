@@ -114,6 +114,7 @@ Options:\n\
 -R			fold data section into text section\n\
 --statistics		print maximum bytes and total seconds used\n\
 --version		print assembler version number and exit\n\
+-V, --vr4300mul-off	turn off vr4300 mulmul fix\n\
 -W			suppress warnings\n\
 -w			ignored\n\
 -X			ignored\n\
@@ -255,6 +256,7 @@ parse_args (pargc, pargv)
 #define OPTION_HELP (OPTION_STD_BASE)
     {"help", no_argument, NULL, OPTION_HELP},
     {"mri", no_argument, NULL, 'M'},
+    {"vr4300mul-off", no_argument, NULL, 'V'},
 #define OPTION_NOCPP (OPTION_STD_BASE + 1)
     {"nocpp", no_argument, NULL, OPTION_NOCPP},
 #define OPTION_STATISTICS (OPTION_STD_BASE + 2)
@@ -484,6 +486,11 @@ parse_args (pargc, pargv)
 	  out_file_name = strdup (optarg);
 	  if (!out_file_name)
 	    as_fatal ("virtual memory exhausted");
+	  break;
+
+	case 'V':
+	  extern int vr4300mul_enabled;
+	  vr4300mul_enabled = 0;
 	  break;
 
 	case 'w':
