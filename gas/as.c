@@ -218,6 +218,8 @@ common_emul_init ()
  * md_parse_option definitions in config/tc-*.c
  */
 
+extern int vr4300mul_enabled;
+
 void
 parse_args (pargc, pargv)
      int *pargc;
@@ -489,7 +491,6 @@ parse_args (pargc, pargv)
 	  break;
 
 	case 'V':
-	  extern int vr4300mul_enabled;
 	  vr4300mul_enabled = 0;
 	  break;
 
