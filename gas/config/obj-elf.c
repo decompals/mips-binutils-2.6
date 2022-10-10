@@ -775,6 +775,7 @@ obj_elf_previous (ignore)
     }
   subseg_set (previous_section, previous_subsection);
   previous_section = 0;
+  mips_define_label(NULL);
 }
 
 static void
