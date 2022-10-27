@@ -6666,6 +6666,7 @@ s_mipsset (x)
 	*input_line_pointer = ch;
 	input_line_pointer = name;
 	s_set(x);
+	return;
     }
   *input_line_pointer = ch;
   demand_empty_rest_of_line ();
