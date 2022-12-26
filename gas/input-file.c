@@ -152,6 +152,11 @@ char* read_asm(const char *pathname, size_t* output_size) {
     char cur_insn_first_char;
 
     fd = fopen(pathname, "r");
+    if (fd == NULL)
+    {
+        as_fatal ("Can't open %s for reading.", pathname);
+    }
+
     fseek(fd, 0, SEEK_END);
     input_size = ftell(fd);
     initial_output_size = input_size;
