@@ -4793,6 +4793,31 @@ int mips_is_gp_reg(char *s)
   return 0;
 }
 
+int mips_is_fp_reg(char *s)
+{
+  if ((s[0] != '$') || (s[1] != 'f'))
+    return false;
+
+  char *e = s+2; // skip the $f
+  while(isalnum(*e)) e++;
+  char save_c = *e;
+
+  *e = '\0'; // NULL terminate the register number
+  symbolS *symbol = symbol_find(s); // get a symbol based on register number
+  *e = save_c; // restore the saved character
+
+  unsigned int symval = 0;
+  if (symbol && (S_GET_SEGMENT (symbol) == reg_section)) // check we got a symbol and that the section matches what we expect
+  {
+    symval = S_GET_VALUE(symbol); // get the value from the symbol (in this case, the register number with a type bit attached)
+    if (symval & RTYPE_FPU) // check that this is a floating point register
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 /*
 This routine assembles an instruction into its binary format.  As a side
 effect it sets one of the global variables imm_reloc or offset_reloc to the
@@ -5121,17 +5146,24 @@ mips_ip (str, ip)
 	    case 'V':
 	    case 'W':
 	      s_reset = s;
-	      if (s[0] == '$' && s[1] == 'f' && isdigit (s[2]))
+	      if (mips_is_fp_reg(s))
 		{
-		  s += 2;
-		  regno = 0;
-		  do
-		    {
-		      regno *= 10;
-		      regno += *s - '0';
-		      ++s;
-		    }
-		  while (isdigit (*s));
+                  char *e = s+1; // skip the $ character
+                  while(isalnum(*e)) e++;
+                  char save_c = *e; // save the character as it will be modified and needs to be restored later
+                  *e = '\0'; // NULL terminate the register number
+                  symbolS *symbol = symbol_find(s); // get a symbol based on register number
+                  *e = save_c; // restore the saved character
+
+                  unsigned int symval = 0;
+                  if(symbol && S_GET_SEGMENT (symbol) == reg_section) // check we got a symbol and that the section matches what we expect
+                  {
+                    symval = S_GET_VALUE(symbol); // get the value from the symbol (in this case, the register number with a type bit attached)
+                    if(symval & RTYPE_FPU) // check that this is a general purpose register
+                      regno = symval & 0x1F; // get the register number
+                  }
+
+                  s = e;
 
 		  if (regno > 31)
 		    as_bad ("Invalid float register number (%d)", regno);
