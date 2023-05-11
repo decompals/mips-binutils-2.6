@@ -76,7 +76,7 @@ jobs:
             ${{ matrix.TARGET.ARCHIVE_NAME }}
       - name: Update release
         uses: johnwbyrd/update-release@v1.0.0
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{ matrix.TARGET.ARCHIVE_NAME }}
