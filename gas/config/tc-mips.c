@@ -5727,6 +5727,8 @@ md_number_to_chars (buf, val, n)
 
 CONST char *md_shortopts = "O::g::G:";
 
+extern boolean gIrixSymtab;
+
 struct option md_longopts[] = {
 #define OPTION_MIPS1 (OPTION_MD_BASE + 1)
   {"mips0", no_argument, NULL, OPTION_MIPS1},
@@ -5766,10 +5768,12 @@ struct option md_longopts[] = {
 
 #define OPTION_CALL_SHARED (OPTION_MD_BASE + 7)
 #define OPTION_NON_SHARED (OPTION_MD_BASE + 8)
+#define OPTION_IRIX_SYMTAB (OPTION_MD_BASE + 19)
 #ifdef OBJ_ELF
   {"KPIC", no_argument, NULL, OPTION_CALL_SHARED},
   {"call_shared", no_argument, NULL, OPTION_CALL_SHARED},
   {"non_shared", no_argument, NULL, OPTION_NON_SHARED},
+  {"irix-symtab", no_argument, NULL, OPTION_IRIX_SYMTAB},
 #endif
 
   {NULL, no_argument, NULL, 0}
@@ -6033,6 +6037,10 @@ md_parse_option (c, arg)
       g_switch_seen = 1;
       break;
 
+    case OPTION_IRIX_SYMTAB:
+      gIrixSymtab = true;
+      break;
+
     default:
       return 0;
     }
@@ -6072,7 +6080,8 @@ MIPS options:\n\
 #ifdef OBJ_ELF
   fprintf(stream, "\
 -KPIC, -call_shared	generate SVR4 position independent code\n\
--non_shared		do not generate position independent code\n");
+-non_shared		do not generate position independent code\n\
+-irix-symtab		create elfs with broken irix symtab\n");
 #endif
 }
 
