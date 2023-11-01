@@ -39,6 +39,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    position independent code.  */
 #define EF_MIPS_CPIC		0x00000004
 
+/* Code in file uses new ABI (-n32 on Irix 6).  */
+#define EF_MIPS_ABI2		0x00000020
+
 /* Four bit MIPS architecture field.  */
 #define EF_MIPS_ARCH		0xf0000000
 
@@ -50,6 +53,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* -mips3 code.  */
 #define E_MIPS_ARCH_3		0x20000000
+
+
+/* The ABI of the file.  Also see EF_MIPS_ABI2 above. */
+#define EF_MIPS_ABI		0x0000F000
+
+/* The original o32 abi. */
+#define E_MIPS_ABI_O32          0x00001000
+
+/* O32 extended to work on 64 bit architectures */
+#define E_MIPS_ABI_O64          0x00002000
+
+/* EABI in 32 bit mode */
+#define E_MIPS_ABI_EABI32       0x00003000
+
+/* EABI in 64 bit mode */
+#define E_MIPS_ABI_EABI64       0x00004000
+
 
 /* Processor specific section indices.  These sections do not actually
    exist.  Symbols with a st_shndx field corresponding to one of these
