@@ -37,6 +37,8 @@
 
 #include "opcode/mips.h"
 
+# define _(String) (String)
+
 #ifdef OBJ_MAYBE_ELF
 /* Clean up namespace so we can include obj-elf.h too.  */
 static int mips_output_flavor () { return OUTPUT_FLAVOR; }
@@ -79,6 +81,20 @@ static char *mips_regmask_frag;
 #define SP  29
 #define FP  30
 #define RA  31
+
+/* The ABI to use.  */
+enum mips_abi_level
+{
+  NO_ABI = 0,
+  O32_ABI,
+  O64_ABI,
+  N32_ABI,
+  N64_ABI,
+  EABI_ABI
+};
+
+/* MIPS ABI we are using for this output file.  */
+static enum mips_abi_level mips_abi = NO_ABI;
 
 struct regname {
   const char *name;
@@ -5725,6 +5741,11 @@ md_number_to_chars (buf, val, n)
     }
 }
 
+static int support_64bit_objects(void)
+{
+  /* Just return false instead of properly check */
+  return 0;
+}
 CONST char *md_shortopts = "O::g::G:";
 
 extern boolean gIrixSymtab;
@@ -5769,11 +5790,19 @@ struct option md_longopts[] = {
 #define OPTION_CALL_SHARED (OPTION_MD_BASE + 7)
 #define OPTION_NON_SHARED (OPTION_MD_BASE + 8)
 #define OPTION_IRIX_SYMTAB (OPTION_MD_BASE + 19)
+#define OPTION_32 (OPTION_MD_BASE + 20)
+#define OPTION_MABI (OPTION_MD_BASE + 21)
+#define OPTION_N32 (OPTION_MD_BASE + 22)
+#define OPTION_64 (OPTION_MD_BASE + 23)
 #ifdef OBJ_ELF
   {"KPIC", no_argument, NULL, OPTION_CALL_SHARED},
   {"call_shared", no_argument, NULL, OPTION_CALL_SHARED},
   {"non_shared", no_argument, NULL, OPTION_NON_SHARED},
   {"irix-symtab", no_argument, NULL, OPTION_IRIX_SYMTAB},
+  {"32", no_argument, NULL, OPTION_32},
+  {"mabi", required_argument, NULL, OPTION_MABI},
+  {"n32", no_argument, NULL, OPTION_N32},
+  {"64", no_argument, NULL, OPTION_64},
 #endif
 
   {NULL, no_argument, NULL, 0}
@@ -6035,6 +6064,45 @@ md_parse_option (c, arg)
       else
 	g_switch_value = atoi (arg);
       g_switch_seen = 1;
+      break;
+
+      /* The -32, -n32 and -64 options are shortcuts for -mabi=32, -mabi=n32
+	 and -mabi=64.  */
+    case OPTION_32:
+      mips_abi = O32_ABI;
+      break;
+
+    case OPTION_N32:
+      mips_abi = N32_ABI;
+      break;
+
+    case OPTION_64:
+      mips_abi = N64_ABI;
+      if (!support_64bit_objects())
+	as_fatal (_("no compiled in support for 64 bit object file format"));
+      break;
+
+    case OPTION_MABI:
+      if (strcmp (arg, "32") == 0)
+	mips_abi = O32_ABI;
+      else if (strcmp (arg, "o64") == 0)
+	mips_abi = O64_ABI;
+      else if (strcmp (arg, "n32") == 0)
+	mips_abi = N32_ABI;
+      else if (strcmp (arg, "64") == 0)
+	{
+	  mips_abi = N64_ABI;
+	  if (! support_64bit_objects())
+	    as_fatal (_("no compiled in support for 64 bit object file "
+			"format"));
+	}
+      else if (strcmp (arg, "eabi") == 0)
+	mips_abi = EABI_ABI;
+      else
+	{
+	  as_fatal (_("invalid abi -mabi=%s"), arg);
+	  return 0;
+	}
       break;
 
     case OPTION_IRIX_SYMTAB:
@@ -7373,6 +7441,18 @@ mips_elf_final_processing ()
     elf_elfheader (stdoutput)->e_flags |= EF_MIPS_NOREORDER;
   if (mips_pic != NO_PIC)
     elf_elfheader (stdoutput)->e_flags |= EF_MIPS_PIC;
+
+  /* Set the MIPS ELF ABI flags.  */
+  if (mips_abi == O32_ABI)
+    elf_elfheader (stdoutput)->e_flags |= E_MIPS_ABI_O32;
+  else if (mips_abi == O64_ABI)
+    elf_elfheader (stdoutput)->e_flags |= E_MIPS_ABI_O64;
+  else if (mips_abi == EABI_ABI)
+    {
+      /* Not carried over from modern binutils */
+    }
+
+  /* Nothing to do for N32_ABI or N64_ABI.  */
 }
 
 #endif /* OBJ_ELF || OBJ_MAYBE_ELF */
