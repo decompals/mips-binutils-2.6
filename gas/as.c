@@ -115,7 +115,7 @@ Options:\n\
 --statistics		print maximum bytes and total seconds used\n\
 --version		print assembler version number and exit\n\
 -V, --vr4300mul-off	turn off vr4300 mulmul fix\n\
--N, --n64align          enable special alignment for Nintendo 64\n\
+-N, --force-n64align          enable special alignment for Nintendo 64\n\
 -W			suppress warnings\n\
 -w			ignored\n\
 -X			ignored\n\
@@ -220,7 +220,7 @@ common_emul_init ()
  */
 
 extern int vr4300mul_enabled;
-extern int n64align_enabled;
+extern int force_n64align_enabled;
 
 void
 parse_args (pargc, pargv)
@@ -261,7 +261,7 @@ parse_args (pargc, pargv)
     {"help", no_argument, NULL, OPTION_HELP},
     {"mri", no_argument, NULL, 'M'},
     {"vr4300mul-off", no_argument, NULL, 'V'},
-    {"n64align", no_argument, NULL, 'N'},
+    {"force-n64align", no_argument, NULL, 'N'},
 #define OPTION_NOCPP (OPTION_STD_BASE + 1)
     {"nocpp", no_argument, NULL, OPTION_NOCPP},
 #define OPTION_STATISTICS (OPTION_STD_BASE + 2)
@@ -498,7 +498,7 @@ parse_args (pargc, pargv)
 	  break;
 
 	case 'N':
-	  n64align_enabled = 1;
+	  force_n64align_enabled = 1;
 	  break;
 
 	case 'w':

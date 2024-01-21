@@ -203,7 +203,7 @@ elf_file_symbol (s)
     }
 }
 
-int n64align_enabled = 0;
+int force_n64align_enabled = 0;
 
 static void
 obj_elf_common (ignore)
@@ -293,7 +293,7 @@ obj_elf_common (ignore)
 	}
       if (temp < n64_extra_align)
 	{
-	  if (n64align_enabled)
+	  if (force_n64align_enabled)
 	    {
 	      temp = n64_extra_align;
 	    }
