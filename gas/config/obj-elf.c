@@ -203,6 +203,8 @@ elf_file_symbol (s)
     }
 }
 
+int force_n64align_enabled = 0;
+
 static void
 obj_elf_common (ignore)
      int ignore;
@@ -275,25 +277,32 @@ obj_elf_common (ignore)
 	    }
 	}
       if (size < 0x400)
-        {
-          if (size < 0x10)
-            {
-              n64_extra_align = 0;
-            }
-          else
-            {
-              n64_extra_align = 8;
-            }
-        }
+	{
+	  if (size < 0x10)
+	    {
+	      n64_extra_align = 0;
+	    }
+	  else
+	    {
+	      n64_extra_align = 8;
+	    }
+	}
       else
-        {
-          n64_extra_align = 16;
-        }
+	{
+	  n64_extra_align = 16;
+	}
       if (temp < n64_extra_align)
-        {
-          as_warn("Variable %s would be aligned in KMC GCC (has %d, would have %d)",
-          S_GET_NAME (symbolP), temp, n64_extra_align);
-        }
+	{
+	  if (force_n64align_enabled)
+	    {
+	      temp = n64_extra_align;
+	    }
+	  else
+	    {
+	      as_warn("Variable %s would be aligned in KMC GCC (has %d, would have %d)",
+	      S_GET_NAME (symbolP), temp, n64_extra_align);
+	    }
+	}
       if (symbolP->local)
 	{
 	  segT old_sec;
