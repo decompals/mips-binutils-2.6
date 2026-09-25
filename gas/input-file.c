@@ -234,36 +234,31 @@ char* read_asm(const char *pathname, size_t* output_size) {
                     if ((cur_char == '\n') && (cur_insn != NULL))
                     {
                         cur_insn_first_char = *cur_insn;
-                        if (prev_insn_was_float_mul == 0)
+                        cur_insn_mul = cur_insn;
+                        if (cur_insn_first_char == 'd')
                         {
-                            if ((local_28 == cur_insn) ||
-                                (((cur_insn_first_char == 'm' && (cur_insn[1] == 'u')) &&
-                                    (((cur_insn[2] == 'l' && (cur_insn[3] == '.')) &&
-                                    ((cur_insn[4] == 's' || (cur_insn[4] == 'd'))))))))
-                            {
-                                prev_insn_was_float_mul = 1;
-                            }
+                            cur_insn_mul = cur_insn + 1;
                         }
-                        else
+                        if (((*cur_insn_mul == 'm') && (cur_insn_mul[1] == 'u')) &&
+                            (cur_insn_mul[2] == 'l') && (cur_insn_mul[3] == '.') &&
+                            (cur_insn_mul[4] == 's' || cur_insn_mul[4] == 'd'))
                         {
-                            cur_insn_mul = cur_insn;
-                            if (cur_insn_first_char == 'd')
+                            if (prev_insn_was_float_mul > 0 && prev_insn_was_float_mul < 5)
                             {
-                                cur_insn_mul = cur_insn + 1;
-                            }
-                            if (((*cur_insn_mul == 'm') && (cur_insn_mul[1] == 'u')) &&
-                                (cur_insn_mul[2] == 'l'))
-                            {
-                                prev_insn_was_float_mul = (cur_insn_mul[3] == '.') ? 1 : 0;
                                 /* Shift the file forward by 5 characters */
                                 bcopy(cur_insn, cur_insn + 5, cur_output_pos - cur_insn);
                                 /* Insert a nop, newline and tab into the gap created by the previous bcopy */
                                 bcopy("nop\n\t", cur_insn, 5);
                                 cur_output_pos = cur_output_pos + 5;
                             }
-                            else
+                            prev_insn_was_float_mul = 1;
+                        }
+                        else if (isalpha(cur_insn_first_char))
+                        {
+                            if (prev_insn_was_float_mul > 0)
                             {
-                                if (isalpha(cur_insn_first_char))
+                                prev_insn_was_float_mul++;
+                                if (prev_insn_was_float_mul >= 5)
                                 {
                                     prev_insn_was_float_mul = 0;
                                 }

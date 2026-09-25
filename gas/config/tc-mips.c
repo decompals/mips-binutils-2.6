@@ -1370,8 +1370,10 @@ append_insn (place, ip, address_expr, reloc_type)
 	     (this means it is a floating point comparison
 	     instruction).  If this instruction uses the condition
 	     codes, we need to insert a single NOP.  */
-	  if (mips_optimize == 0
-	      || (pinfo & INSN_READ_COND_CODE))
+	  if (mips_optimize == 0)
+	    nops += ((mips_cpu == 4300 || mips_cpu == 4000)
+		     && (prev_insn.insn_opcode & 0xffe00000) == 0x46200000) ? 2 : 1;
+	  else if (pinfo & INSN_READ_COND_CODE)
 	    ++nops;
 	}
       else if (prev_pinfo & INSN_READ_LO)
