@@ -89,6 +89,7 @@ void ignore_rest_of_line PARAMS ((void));
 void pseudo_set PARAMS ((symbolS * symbolP));
 void read_a_source_file PARAMS ((char *name));
 void read_begin PARAMS ((void));
+void pobegin PARAMS ((void));
 void s_abort PARAMS ((int));
 void s_align_bytes PARAMS ((int arg));
 void s_align_ptwo PARAMS ((int));

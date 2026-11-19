@@ -55,6 +55,11 @@ little-endian output at run time (unlike the other @sc{gnu} development
 tools, which must be configured for one or the other).  Use @samp{-EB}
 to select big-endian output, and @samp{-EL} for little-endian.
 
+@item -mdebug
+@itemx -mno-debug
+Enable or disable ECOFF debugging information in the @code{.mdebug}
+section.  The default is @samp{-mno-debug}.
+
 @cindex MIPS architecture options
 @item -mips1
 @itemx -mips2

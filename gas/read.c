@@ -209,7 +209,6 @@ char *demand_copy_string PARAMS ((int *lenP));
 int is_it_end_of_statement PARAMS ((void));
 static segT get_segmented_expression PARAMS ((expressionS *expP));
 static segT get_known_segmented_expression PARAMS ((expressionS * expP));
-static void pobegin PARAMS ((void));
 static int get_line_sb PARAMS ((sb *));
 
 
@@ -217,9 +216,6 @@ void
 read_begin ()
 {
   const char *p;
-
-  pobegin ();
-  obj_read_begin_hook ();
 
   /* Something close -- but not too close -- to a multiple of 1024.
      The debugging malloc I'm using has 24 bytes of overhead.  */
@@ -413,7 +409,7 @@ pop_insert (table)
 #define obj_pop_insert()	pop_insert(obj_pseudo_table)
 #endif
 
-static void 
+void
 pobegin ()
 {
   po_hash = hash_new ();
@@ -749,17 +745,14 @@ read_a_source_file (name)
 		      c = *input_line_pointer;
 		      *input_line_pointer = '\0';
 
-#ifdef OBJ_GENERATE_ASM_LINENO
-		      if (generate_asm_lineno == 0)
-			{
-		          if (ecoff_no_current_file ())
-			    generate_asm_lineno = 1;
-			}
-		      if (generate_asm_lineno == 1)
+#if defined (OBJ_GENERATE_ASM_LINENO) && defined (ECOFF_DEBUGGING)
+		      if (ECOFF_DEBUGGING
+			  && (generate_asm_lineno || ecoff_no_current_file ()))
 		        {
 			  unsigned int lineno;
 			  char *s;
 
+			  generate_asm_lineno = 1;
 			  as_where (&s, &lineno);
 			  OBJ_GENERATE_ASM_LINENO (s, lineno);
 		        }
