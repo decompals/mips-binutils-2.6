@@ -71,6 +71,8 @@ static int mips_output_flavor () { return OUTPUT_FLAVOR; }
 
 #include "ecoff.h"
 
+int mips_flag_mdebug;
+
 static char *mips_regmask_frag;
 
 #define AT  1
@@ -5803,6 +5805,10 @@ struct option md_longopts[] = {
   {"mabi", required_argument, NULL, OPTION_MABI},
   {"n32", no_argument, NULL, OPTION_N32},
   {"64", no_argument, NULL, OPTION_64},
+#ifndef NO_ECOFF_DEBUGGING
+  {"mdebug", no_argument, &mips_flag_mdebug, 1},
+  {"mno-debug", no_argument, &mips_flag_mdebug, 0},
+#endif
 #endif
 
   {NULL, no_argument, NULL, 0}
@@ -6150,6 +6156,9 @@ MIPS options:\n\
 -KPIC, -call_shared	generate SVR4 position independent code\n\
 -non_shared		do not generate position independent code\n\
 -irix-symtab		create elfs with broken irix symtab\n");
+#ifndef NO_ECOFF_DEBUGGING
+  fprintf (stream, "-mdebug, -mno-debug\temit or omit ECOFF .mdebug [default off]\n");
+#endif
 #endif
 }
 
