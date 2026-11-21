@@ -349,6 +349,7 @@ parse_args (pargc, pargv)
 	  show_usage (stdout);
 	  exit (EXIT_SUCCESS);
 
+	case 0:			/* getopt_long_only set a flag.  */
 	case OPTION_NOCPP:
 	  break;
 
@@ -566,6 +567,8 @@ main (argc, argv)
   subsegs_begin ();
   read_begin ();
   parse_args (&argc, &argv);
+  pobegin ();
+  obj_read_begin_hook ();
   input_scrub_begin ();
   expr_begin ();
 

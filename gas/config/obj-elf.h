@@ -91,12 +91,15 @@ extern void obj_elf_version PARAMS ((int));
 extern void obj_elf_init_stab_section PARAMS ((segT));
 #define INIT_STAB_SECTION(seg) obj_elf_init_stab_section (seg)
 
-/* For now, always set ECOFF_DEBUGGING for a MIPS target.  */
-#ifdef TC_MIPS
-// #define ECOFF_DEBUGGING 0
+#if defined (TC_MIPS) && !defined (OBJ_MAYBE_ELF)
+#define ECOFF_DEBUGGING mips_flag_mdebug
+extern int mips_flag_mdebug;
 #endif
 
-#if ECOFF_DEBUGGING
+#ifdef ECOFF_DEBUGGING
+
+#include "ecoff.h"
+extern void elf_ecoff_set_ext PARAMS ((struct symbol *, EXTR *));
 
 /* If we are generating ECOFF debugging information, we need some
    additional fields for each symbol.  */
@@ -110,9 +113,10 @@ extern void obj_elf_init_stab_section PARAMS ((segT));
 /* We smuggle stabs in ECOFF rather than using a separate section.
    The Irix linker can not handle a separate stabs section.  */
 #undef SEPARATE_STAB_SECTIONS
-#undef INIT_STAB_SECTION
+#define SEPARATE_STAB_SECTIONS (!ECOFF_DEBUGGING)
 #define OBJ_PROCESS_STAB(seg, what, string, type, other, desc) \
-  ecoff_stab ((seg), (what), (string), (type), (other), (desc))
+  if (ECOFF_DEBUGGING) \
+    ecoff_stab ((seg), (what), (string), (type), (other), (desc))
 
 #define OBJ_GENERATE_ASM_LINENO(filename, lineno) \
   ecoff_generate_asm_lineno ((filename), (lineno))
