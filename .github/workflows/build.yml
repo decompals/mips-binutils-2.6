@@ -11,13 +11,13 @@ jobs:
         TARGET:
           - {
               OS: 'ubuntu-24.04',
-              CFLAGS: '-static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              CFLAGS: '-std=gnu89 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
               HOST: 'i386-pc-linux',
               ARCHIVE_NAME: 'binutils-2.6-linux.tar.gz'
             }
           - {
               OS: 'macos-latest',
-              CFLAGS: '-DDARWIN -Wno-return-type -Wno-error -Wno-implicit-function-declaration -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              CFLAGS: '-std=gnu89 -DDARWIN -Wno-return-type -Wno-error -Wno-implicit-function-declaration -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
               HOST: 'i386-apple-darwin',
               ARCHIVE_NAME: 'binutils-2.6-mac.tar.gz'
             }
