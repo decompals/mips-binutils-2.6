@@ -10,7 +10,7 @@ jobs:
       matrix:
         TARGET:
           - {
-              OS: 'ubuntu-latest',
+              OS: 'ubuntu-24.04',
               CFLAGS: '-static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
               HOST: 'i386-pc-linux',
               ARCHIVE_NAME: 'binutils-2.6-linux.tar.gz'
@@ -24,11 +24,11 @@ jobs:
 
     name: Building binutils for ${{ matrix.TARGET.OS }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@main
 
       - name: Install dependencies (Ubuntu)
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.OS == 'ubuntu-24.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bison file gperf
@@ -74,7 +74,7 @@ jobs:
           tar -czf ${{ matrix.TARGET.ARCHIVE_NAME }} ar as strip objcopy c++filt
 
       - name: Upload archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@main
         with:
           name: binutils-2.6-${{ matrix.TARGET.OS }}
           path: |
